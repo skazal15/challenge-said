@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.git/
+.env
+.venv
+env/
+venv/
+tests/
+.pytest_cache/
+.serverless/
