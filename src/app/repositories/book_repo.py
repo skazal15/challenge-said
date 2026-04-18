@@ -12,16 +12,28 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 class DynamoDBBookRepository(IBookRepository):
     def __init__(self, table_name: str):
         endpoint_url = os.getenv("DYNAMODB_ENDPOINT")
-        config = Config(connect_timeout=2, read_timeout=2, retries={'max_attempts': 0})
         
-        self.dynamodb = boto3.resource(
-            'dynamodb', 
-            endpoint_url=endpoint_url,
-            region_name=os.getenv("AWS_REGION", "us-east-1"),
-            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", "local"),
-            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "local"),
-            config=config
+        # Third: Timeouts - Explicitly set timeouts to prevent hanging
+        config = Config(
+            connect_timeout=2, 
+            read_timeout=2, 
+            retries={'max_attempts': 0}
         )
+        
+        access_key = os.getenv("AWS_ACCESS_KEY_ID")
+        secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+        
+        kwargs = {
+            'endpoint_url': endpoint_url,
+            'region_name': os.getenv("AWS_REGION", "ap-southeast-2"),
+            'config': config
+        }
+        
+        if access_key and secret_key:
+            kwargs['aws_access_key_id'] = access_key
+            kwargs['aws_secret_access_key'] = secret_key
+            
+        self.dynamodb = boto3.resource('dynamodb', **kwargs)
         self.table = self.dynamodb.Table(table_name)
 
     @retry(
