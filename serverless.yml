@@ -6,6 +6,18 @@ provider:
   region: ap-southeast-2
   environment:
     BOOKS_TABLE: ${self:service}-books-table
+  # Grant Lambda permission to access DynamoDB
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:Query
+        - dynamodb:Scan
+      Resource: 
+        - Fn::GetAtt: [BooksTable, Arn]
 
 functions:
   api:
