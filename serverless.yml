@@ -6,22 +6,21 @@ provider:
   region: ap-southeast-2
   environment:
     BOOKS_TABLE: ${self:service}-books-table
-  # Grant Lambda permission to access DynamoDB
+  # Least Privilege: only grant actions the code actually uses
   iamRoleStatements:
     - Effect: Allow
       Action:
         - dynamodb:PutItem
         - dynamodb:GetItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-        - dynamodb:Query
-        - dynamodb:Scan
-      Resource: 
+      Resource:
         - Fn::GetAtt: [BooksTable, Arn]
 
 functions:
-  api:
+  bookApi:
     handler: src.handler.handler
+    description: "Book Management REST API — FastAPI on Lambda via Mangum"
+    timeout: 10
+    memorySize: 256
     events:
       - http:
           path: /{proxy+}
