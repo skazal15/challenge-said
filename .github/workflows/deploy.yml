@@ -9,21 +9,27 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - name: Install Serverless Framework
-        run: npm install -g serverless
+
+      - name: Install Serverless Framework v3
+        run: npm install -g serverless@3
+
       - name: Install Serverless Plugins
         run: npm install --save-dev serverless-python-requirements
+
       - name: Serverless Deploy
         run: sls deploy
         env:
