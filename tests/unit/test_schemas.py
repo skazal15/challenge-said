@@ -37,12 +37,23 @@ class TestBookCreateSchema:
         missing_fields = {e["loc"][0] for e in errors}
         assert {"name", "note", "serial"}.issubset(missing_fields)
 
-    def test_create_with_empty_string_is_valid(self):
-        """Empty strings are technically valid (no min-length constraint)."""
-        book = BookCreate(
-            id="", author="", name="", note="", serial=""
-        )
-        assert book.id == ""
+    def test_create_with_empty_strings_should_fail(self):
+        """Empty strings in required fields now fail (min_length=1 enforced)."""
+        with pytest.raises(ValidationError):
+            BookCreate(id="", author="", name="", note="", serial="")
+
+    def test_create_with_invalid_characters_should_fail(self):
+        """Fields like ID and Serial reject malicious characters (regex enforced)."""
+        with pytest.raises(ValidationError) as exc_info:
+            BookCreate(
+                id="<script>alert(1)</script>",
+                author="/authors/id1",
+                name="Attack Book",
+                note="Just a note",
+                serial="OR 1=1"
+            )
+        errors = str(exc_info.value)
+        assert "String should match pattern" in errors
 
     def test_model_dump_returns_complete_dictionary(self, sample_book_create):
         """model_dump() returns all fields as a plain dictionary."""
