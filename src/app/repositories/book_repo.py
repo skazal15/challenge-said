@@ -13,15 +13,11 @@ class DynamoDBBookRepository(IBookRepository):
     def __init__(self, table_name: str):
         endpoint_url = os.getenv("DYNAMODB_ENDPOINT")
         
-        # Third: Timeouts - Explicitly set timeouts to prevent hanging
         config = Config(
             connect_timeout=2, 
             read_timeout=2, 
             retries={'max_attempts': 0}
         )
-        
-        access_key = os.getenv("AWS_ACCESS_KEY_ID")
-        secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
         
         kwargs = {
             'endpoint_url': endpoint_url,
@@ -29,9 +25,18 @@ class DynamoDBBookRepository(IBookRepository):
             'config': config
         }
         
-        if access_key and secret_key:
+        # LOGIC FIX: 
+        # Only use manual keys if we are running LOCALLY (endpoint_url is set).
+        # If endpoint_url is None, we are in AWS Lambda. 
+        # In Lambda, we MUST NOT pass aws_access_key_id/secret_access_key.
+        if endpoint_url:
+            logger.info("Initializing DynamoDB in LOCAL mode")
+            access_key = os.getenv("AWS_ACCESS_KEY_ID", "local")
+            secret_key = os.getenv("AWS_SECRET_ACCESS_KEY", "local")
             kwargs['aws_access_key_id'] = access_key
             kwargs['aws_secret_access_key'] = secret_key
+        else:
+            logger.info("Initializing DynamoDB in CLOUD mode (using IAM Role)")
             
         self.dynamodb = boto3.resource('dynamodb', **kwargs)
         self.table = self.dynamodb.Table(table_name)
