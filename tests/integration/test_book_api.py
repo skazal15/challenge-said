@@ -61,19 +61,19 @@ class TestCreateBookEndpoint:
         assert "already exists" in response.json()["detail"]
 
     @mock_aws
-    def test_create_book_missing_fields_should_return_422(self, api_client):
-        """Incomplete payload returns 422 Unprocessable Entity (Pydantic validation)."""
+    def test_create_book_missing_fields_should_return_400(self, api_client):
+        """Incomplete payload returns 400 Bad Request (Custom Validation)."""
         incomplete_data = {"id": "/books/id1", "name": "Incomplete Book"}
 
         response = api_client.post("/api/books/", json=incomplete_data)
 
-        assert response.status_code == 422
+        assert response.status_code == 400
 
     @mock_aws
-    def test_create_book_empty_body_should_return_422(self, api_client):
-        """Empty JSON body returns 422."""
+    def test_create_book_empty_body_should_return_400(self, api_client):
+        """Empty JSON body returns 400."""
         response = api_client.post("/api/books/", json={})
-        assert response.status_code == 422
+        assert response.status_code == 400
 
     @mock_aws
     def test_create_multiple_books_should_succeed(self, api_client):
