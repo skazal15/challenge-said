@@ -27,10 +27,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Unit Tests
-        run: pytest tests/unit
+        run: pytest -m unit -v
 
       - name: Run Integration Tests
-        run: pytest tests/integration
+        run: pytest -m integration -v
 
   deploy:
     name: Deploy to AWS Lambda
