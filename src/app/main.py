@@ -5,7 +5,8 @@ from src.app.api.v1.books import router as books_router
 app = FastAPI(
     title="Book Management API",
     description="A resilient REST API for managing books using FastAPI and DynamoDB",
-    version="1.0.0"
+    version="1.0.0",
+    root_path="/dev"
 )
 
 @app.get("/health", tags=["System"])
