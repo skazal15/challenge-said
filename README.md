@@ -43,17 +43,32 @@ The easiest way to test the API locally is using Docker. It will spin up a local
    - Health: `http://localhost:8080/health`
 
 ### Option B: Run Tests Locally
-To ensure everything is working correctly, you can run the test suite:
+To ensure everything is working correctly, you can run the test suite. It is highly recommended to use a virtual environment.
 
-1. **Install dependencies:**
-   \`\`\`bash
+1. **Create and activate a virtual environment (optional but recommended):**
+   ```bash
+   python -m venv .venv
+   # Windows:
+   .venv\Scripts\activate
+   # Linux/Mac:
+   source .venv/bin/activate
+   ```
+2. **Install dependencies:**
+   ```bash
    pip install -r requirements.txt
-   \`\`\`
-2. **Run all tests:**
-   \`\`\`bash
+   ```
+3. **Run tests:**
+   We use markers to separate unit and integration tests.
+   ```bash
+   # Run all tests (both unit and integration tests using Moto to mock AWS)
    pytest
-   \`\`\`
-   *(This will run both unit tests and integration tests using Moto to mock AWS)*.
+
+   # Run ONLY Unit Tests (Fast, no mocked infrastructure)
+   pytest -m unit
+
+   # Run ONLY Integration Tests (Exercises full HTTP lifecycle with mocked DynamoDB)
+   pytest -m integration
+   ```
 
 ### Option C: Manual AWS Deployment
 If you have the Serverless Framework installed:
