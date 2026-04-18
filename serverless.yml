@@ -12,17 +12,11 @@ functions:
     handler: src.handler.handler
     events:
       - http:
-          path: /api/books
-          method: post
+          path: /{proxy+}
+          method: any
       - http:
-          path: /api/books/{id}
-          method: get
-      - http:
-          path: /api/books/docs
-          method: get
-      - http:
-          path: /api/books/openapi.json
-          method: get
+          path: /
+          method: any
 
 resources:
   Resources:
